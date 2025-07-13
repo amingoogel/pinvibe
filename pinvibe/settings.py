@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-)o!$j410)r)yt4kvr!i!wztpozg#_hxjl+$80c4g4el5$m=d)p
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['pinvibe.herokuapp.com', 'localhost']
+ALLOWED_HOSTS = ['pinvibe.onrender.com', 'localhost']
 
 
 # Application definition
@@ -100,9 +100,12 @@ REST_FRAMEWORK = {
 
 DATABASES = {
 
-    'default': dj_database_url.config(default='sqlite:///db.sqlite3')
+    'default': dj_database_url.config(default='sqlite:///db.sqlite3',conn_max_age=600)
 }
 
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if DATABASE_URL:
+    DATABASES['default'] = dj_database_url.parse(DATABASE_URL)
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
