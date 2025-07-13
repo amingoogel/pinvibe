@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block title %}Create Pin - PinVibe{% endblock %}
 {% block content %}
-<div class="min-h-screen bg-gradient-to-br from-red-50 to-pink-50 py-12 px-4">
+<div class="min-h-screen bg-gradient-to-br from-red-50 to-pink-50 py-12 px-2 md:px-4">
     <div class="max-w-2xl mx-auto">
         <!-- Header -->
         <div class="text-center mb-8">
@@ -13,7 +13,7 @@
         </div>
 
         <!-- Create Pin Form -->
-        <div class="bg-white rounded-2xl shadow-xl p-8">
+        <div class="bg-white rounded-2xl shadow-xl p-4 md:p-8">
             <form method="post" enctype="multipart/form-data" class="space-y-6">
                 {% csrf_token %}
                 

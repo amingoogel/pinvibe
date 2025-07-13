@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 {% block title %}{{ pin.title }} - PinVibe{% endblock %}
 {% block content %}
-<div class="max-w-6xl mx-auto px-4">
+<div class="max-w-6xl mx-auto px-2 md:px-4">
     <div class="bg-white rounded-xl shadow-lg overflow-hidden">
         <!-- Pin Image and Info -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-0">
             <!-- Image Section -->
             <div class="relative">
-                <img src="{{ pin.image.url }}" alt="{{ pin.title }}" class="w-full h-96 lg:h-full object-cover">
+                <img src="{{ pin.image.url }}" alt="{{ pin.title }}" class="w-full h-64 md:h-96 lg:h-full object-cover">
                 {% if pin.category %}
                     <div class="absolute top-4 left-4">
                         <span class="bg-blue-500 text-white text-sm px-3 py-1 rounded-full font-medium">{{ pin.category.name }}</span>
