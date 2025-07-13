@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block title %}{{ profile_user.username }}'s Profile{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto bg-white rounded-lg shadow p-6">
+    <div class="flex items-start justify-between mb-6">
+        <div class="flex items-center space-x-6">
+            <div class="w-24 h-24 flex-shrink-0">
+                {% if profile_user.avatar %}
+                    <img src="{{ profile_user.avatar.url }}" alt="{{ profile_user.username }}'s avatar" class="w-full h-full object-cover rounded-full shadow-md">
+                {% else %}
+                    <div class="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 rounded-full flex items-center justify-center text-gray-600 shadow-md">
+                        <span class="text-sm">No Avatar</span>
+                    </div>
+                {% endif %}
+            </div>
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">{{ profile_user.username }}</h1>
+                <p class="text-gray-600 text-lg leading-relaxed">{{ profile_user.bio|default:"No bio yet." }}</p>
+            </div>
+        </div>
+        
+        <!-- Follow/Unfollow Button - Right Side -->
+        {% if user.is_authenticated and user != profile_user %}
+            <div class="flex-shrink-0">
+                {% if is_following %}
+                    <a href="{% url 'unfollow_user' profile_user.username %}" class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 shadow-sm hover:shadow-md flex items-center">
+                        <i class="fas fa-user-minus mr-2"></i>Unfollow
+                    </a>
+                {% else %}
+                    <a href="{% url 'follow_user' profile_user.username %}" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 shadow-sm hover:shadow-md flex items-center">
+                        <i class="fas fa-user-plus mr-2"></i>Follow
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Followers and Following Stats -->
+    <div class="bg-gray-50 rounded-lg p-4 mb-6">
+        <div class="flex space-x-8">
+            <a href="{% url 'followers_list' profile_user.username %}" class="flex flex-col items-center hover:scale-105 transition-transform duration-200">
+                <span class="text-2xl font-bold text-blue-600">{{ followers }}</span>
+                <span class="text-sm text-gray-600">Followers</span>
+            </a>
+            <a href="{% url 'following_list' profile_user.username %}" class="flex flex-col items-center hover:scale-105 transition-transform duration-200">
+                <span class="text-2xl font-bold text-green-600">{{ following }}</span>
+                <span class="text-sm text-gray-600">Following</span>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Pins Section -->
+    <div class="mb-8">
+        <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center">
+            <i class="fas fa-thumbtack mr-2 text-red-500"></i>Pins
+        </h2>
+        <div class="pin-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            {% for pin in pins %}
+            <div class="pin-card bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200">
+                <a href="{% url 'pin_detail' pin.id %}">
+                    <div class="relative">
+                        <img src="{{ pin.image.url }}" alt="{{ pin.title }}" class="w-full h-48 object-cover">
+                        <div class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-50 transition-opacity duration-300 flex items-center justify-center opacity-0 hover:opacity-100">
+                            <button class="bg-white text-gray-800 px-4 py-2 rounded-full mr-3 font-medium hover:bg-gray-100 transition-colors duration-200">
+                                <i class="fas fa-bookmark mr-1"></i>Save
+                            </button>
+                            <button class="bg-white text-red-500 px-4 py-2 rounded-full font-medium hover:bg-gray-100 transition-colors duration-200">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </a>
+                <div class="p-4">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">{{ pin.title }}</h3>
+                    <p class="text-gray-600 text-sm mb-2">{{ pin.description|truncatewords:10 }}</p>
+                    {% if pin.category %}
+                        <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">{{ pin.category.name }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center py-8">
+                <i class="fas fa-thumbtack text-4xl text-gray-300 mb-4"></i>
+                <p class="text-gray-500">No pins yet</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Boards Section -->
+    <div>
+        <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center">
+            <i class="fas fa-layer-group mr-2 text-purple-500"></i>Boards
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            {% for board in boards %}
+                <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">{{ board.name }}</h3>
+                    <p class="text-gray-600 mb-4">{{ board.pins.count }} Pins</p>
+                    <a href="{% url 'board_detail' board.id %}" class="inline-block bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg transition-colors duration-200">
+                        <i class="fas fa-eye mr-1"></i>View Board
+                    </a>
+                </div>
+            {% empty %}
+            <div class="col-span-full text-center py-8">
+                <i class="fas fa-layer-group text-4xl text-gray-300 mb-4"></i>
+                <p class="text-gray-500">No boards yet</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

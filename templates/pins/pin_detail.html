@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+{% block title %}{{ pin.title }} - PinVibe{% endblock %}
+{% block content %}
+<div class="max-w-6xl mx-auto px-4">
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <!-- Pin Image and Info -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-0">
+            <!-- Image Section -->
+            <div class="relative">
+                <img src="{{ pin.image.url }}" alt="{{ pin.title }}" class="w-full h-96 lg:h-full object-cover">
+                {% if pin.category %}
+                    <div class="absolute top-4 left-4">
+                        <span class="bg-blue-500 text-white text-sm px-3 py-1 rounded-full font-medium">{{ pin.category.name }}</span>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Content Section -->
+            <div class="p-8">
+                <!-- Pin Header -->
+                <div class="mb-6">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-3">{{ pin.title }}</h1>
+                    <p class="text-gray-600 text-lg leading-relaxed mb-4">{{ pin.description }}</p>
+                    
+                    <!-- User Info -->
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-12 h-12 flex-shrink-0">
+                            {% if pin.user.avatar %}
+                                <img src="{{ pin.user.avatar.url }}" alt="{{ pin.user.username }}'s avatar" class="w-full h-full object-cover rounded-full">
+                            {% else %}
+                                <div class="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 rounded-full flex items-center justify-center">
+                                    <span class="text-gray-600 font-medium">{{ pin.user.username|first|upper }}</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <a href="{% url 'profile' pin.user.username %}" class="text-lg font-semibold text-gray-800 hover:text-blue-600 transition-colors duration-200">
+                                {{ pin.user.username }}
+                            </a>
+                            <p class="text-sm text-gray-500">Pin creator</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="mb-8">
+                    {% if user.is_authenticated %}
+                        <div class="flex flex-wrap gap-3">
+                            <!-- Save Button -->
+                            <div class="flex-1">
+                                <form method="post" action="{% url 'save_pin' pin.id %}" class="flex">
+                                    {% csrf_token %}
+                                    <select name="board" class="flex-1 p-3 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        <option value="">Choose a board...</option>
+                                        {% for board in user.boards.all %}
+                                            <option value="{{ board.id }}">{{ board.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-r-lg font-medium transition-colors duration-200">
+                                        <i class="fas fa-bookmark mr-2"></i>Save
+                                    </button>
+                                </form>
+                            </div>
+                            
+                            <!-- Like Button -->
+                            <form method="post" action="{% url 'add_like' pin.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center">
+                                    <i class="fas fa-heart mr-2"></i>{{ pin.likes.count }} Likes
+                                </button>
+                            </form>
+                            
+                            <!-- Edit/Delete for Pin Owner -->
+                            {% if pin.user == user %}
+                                <a href="{% url 'edit_pin' pin.id %}" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center">
+                                    <i class="fas fa-edit mr-2"></i>Edit
+                                </a>
+                                <a href="{% url 'delete_pin' pin.id %}" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center">
+                                    <i class="fas fa-trash mr-2"></i>Delete
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <div class="bg-gray-50 rounded-lg p-4 text-center">
+                            <p class="text-gray-600 mb-3">Log in to save or like this pin</p>
+                            <a href="{% url 'login' %}" class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 inline-flex items-center">
+                                <i class="fas fa-sign-in-alt mr-2"></i>Log In
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Stats -->
+                <div class="flex items-center space-x-6 text-gray-500 mb-6">
+                    <span class="flex items-center">
+                        <i class="fas fa-heart mr-2 text-red-400"></i>
+                        {{ pin.likes.count }} likes
+                    </span>
+                    <span class="flex items-center">
+                        <i class="fas fa-bookmark mr-2 text-blue-400"></i>
+                        {{ pin.saved_by.count }} saves
+                    </span>
+                    <span class="flex items-center">
+                        <i class="fas fa-comment mr-2 text-green-400"></i>
+                        {{ comments.count }} comments
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Comments Section -->
+        <div class="border-t border-gray-200 p-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                <i class="fas fa-comments mr-2 text-blue-500"></i>Comments
+            </h2>
+            
+            <!-- Add Comment Form -->
+            {% if user.is_authenticated %}
+                <form method="post" action="{% url 'add_comment' pin.id %}" class="mb-8">
+                    {% csrf_token %}
+                    <div class="flex space-x-3">
+                        <div class="w-10 h-10 flex-shrink-0">
+                            {% if user.avatar %}
+                                <img src="{{ user.avatar.url }}" alt="{{ user.username }}'s avatar" class="w-full h-full object-cover rounded-full">
+                            {% else %}
+                                <div class="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 rounded-full flex items-center justify-center">
+                                    <span class="text-gray-600 text-sm font-medium">{{ user.username|first|upper }}</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="flex-1">
+                            <textarea name="text" rows="3" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" placeholder="Add a comment..."></textarea>
+                            <button type="submit" class="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200">
+                                <i class="fas fa-paper-plane mr-2"></i>Post Comment
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            {% else %}
+                <div class="bg-gray-50 rounded-lg p-4 text-center mb-8">
+                    <p class="text-gray-600 mb-3">Log in to add a comment</p>
+                    <a href="{% url 'login' %}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 inline-flex items-center">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Log In
+                    </a>
+                </div>
+            {% endif %}
+            
+            <!-- Comments List -->
+            <div class="space-y-4">
+                {% for comment in comments %}
+                    <div class="flex space-x-4 p-4 bg-gray-50 rounded-lg">
+                        <div class="w-10 h-10 flex-shrink-0">
+                            {% if comment.user.avatar %}
+                                <img src="{{ comment.user.avatar.url }}" alt="{{ comment.user.username }}'s avatar" class="w-full h-full object-cover rounded-full">
+                            {% else %}
+                                <div class="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 rounded-full flex items-center justify-center">
+                                    <span class="text-gray-600 text-sm font-medium">{{ comment.user.username|first|upper }}</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-2 mb-1">
+                                <a href="{% url 'profile' comment.user.username %}" class="font-semibold text-gray-800 hover:text-blue-600 transition-colors duration-200">
+                                    {{ comment.user.username }}
+                                </a>
+                                <span class="text-xs text-gray-500">{{ comment.created_at|timesince }} ago</span>
+                            </div>
+                            <p class="text-gray-700">{{ comment.text }}</p>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="text-center py-8">
+                        <div class="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-comment text-2xl text-gray-400"></i>
+                        </div>
+                        <p class="text-gray-500">No comments yet. Be the first to comment!</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

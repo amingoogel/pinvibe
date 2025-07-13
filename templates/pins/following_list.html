@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}{{ profile_user.username }}'s Following{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto bg-white rounded-lg shadow p-6">
+    <h1 class="text-2xl font-bold mb-4">{{ profile_user.username }}'s Following</h1>
+    {% for follow in following %}
+        <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 flex-shrink-0">
+                    {% if follow.following.avatar %}
+                        <img src="{{ follow.following.avatar.url }}" alt="{{ follow.following.username }}'s avatar" class="w-full h-full object-cover rounded-full">
+                    {% else %}
+                        <div class="w-full h-full bg-gray-300 rounded-full flex items-center justify-center text-gray-600">No Avatar</div>
+                    {% endif %}
+                </div>
+                <a href="{% url 'profile' follow.following.username %}" class="text-gray-800 hover:underline">{{ follow.following.username }}</a>
+            </div>
+            {% if profile_user == user %}
+                <a href="{% url 'unfollow_user' follow.following.username %}" class="text-red-600 hover:underline">Unfollow</a>
+            {% endif %}
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

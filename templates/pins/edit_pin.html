@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Edit Pin{% endblock %}
+{% block content %}
+<div class="max-w-md mx-auto bg-white rounded-lg shadow p-6">
+    <h1 class="text-2xl font-bold mb-4">Edit Pin</h1>
+    {% if messages %}
+        {% for message in messages %}
+            <p class="{% if message.tags == 'success' %}text-green-600{% else %}text-red-600{% endif %}">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="mb-4">
+            <label class="block text-gray-600 mb-2">Title</label>
+            <input type="text" name="title" value="{{ pin.title }}" class="w-full p-2 border rounded-lg" required>
+        </div>
+        <div class="mb-4">
+            <label class="block text-gray-600 mb-2">Description</label>
+            <textarea name="description" class="w-full p-2 border rounded-lg">{{ pin.description }}</textarea>
+        </div>
+        <div class="mb-4">
+            <label class="block text-gray-600 mb-2">Image</label>
+            <input type="file" name="image" class="w-full p-2 border rounded-lg">
+            {% if pin.image %}
+                <img src="{{ pin.image.url }}" alt="Current Image" class="w-full rounded-lg mt-2">
+            {% endif %}
+        </div>
+        <div class="mb-4">
+            <label class="block text-gray-600 mb-2">Board</label>
+            <select name="board" class="w-full p-2 border rounded-lg">
+                <option value="">No Board</option>
+                {% for board in boards %}
+                    <option value="{{ board.id }}" {% if pin.board == board %}selected{% endif %}>{{ board.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-4">
+            <label class="block text-gray-600 mb-2">Category</label>
+            <select name="category" class="w-full p-2 border rounded-lg">
+                <option value="">No Category</option>
+                {% for category in categories %}
+                    <option value="{{ category.id }}" {% if pin.category == category %}selected{% endif %}>{{ category.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-full">Update Pin</button>
+    </form>
+</div>
+{% endblock %}

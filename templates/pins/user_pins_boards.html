@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}Your Pins & Boards{% endblock %}
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <h1 class="text-2xl font-bold mb-4">Your Pins & Boards</h1>
+    {% if messages %}
+        {% for message in messages %}
+            <p class="{% if message.tags == 'success' %}text-green-600{% else %}text-red-600{% endif %}">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+    <h2 class="text-xl font-semibold mb-2">Your Pins</h2>
+    <div class="pin-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        {% for pin in pins %}
+        <div class="pin-card bg-white rounded-lg shadow p-2 relative overflow-hidden">
+            <a href="{% url 'pin_detail' pin.id %}">
+                <img src="{{ pin.image.url }}" alt="{{ pin.title }}" class="w-full h-48 object-cover rounded-lg">
+                <div class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-50 transition-opacity duration-300 flex items-center justify-center opacity-0 hover:opacity-100">
+                    <button class="bg-transparent border border-white text-white px-3 py-1 rounded-full mr-2">Save</button>
+                    <button class="text-white"><i class="fas fa-heart"></i></button>
+                </div>
+            </a>
+            <h3 class="mt-2 text-lg font-semibold text-gray-800">{{ pin.title }}</h3>
+            <p class="text-gray-600 text-sm">{{ pin.description|truncatewords:10 }}</p>
+            {% if pin.category %}
+                <p class="text-gray-500 text-xs">Category: {{ pin.category.name }}</p>
+            {% endif %}
+            <div class="mt-2 text-sm text-gray-600">
+                By <a href="{% url 'profile' pin.user.username %}" class="text-gray-800 hover:underline">{{ pin.user.username }}</a>
+                {% if pin.user.avatar %}
+                    <img src="{{ pin.user.avatar.url }}" alt="{{ pin.user.username }}'s avatar" class="w-6 h-6 rounded-full inline-block ml-2 align-middle">
+                {% else %}
+                    <div class="w-6 h-6 bg-gray-300 rounded-full inline-block ml-2 align-middle"></div>
+                {% endif %}
+            </div>
+            <div class="mt-2">
+                <a href="{% url 'edit_pin' pin.id %}" class="hover:underline">Edit</a>
+                <a href="{% url 'delete_pin' pin.id %}" class="hover:underline ml-4">Delete</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <h2 class="text-xl font-semibold mt-6 mb-2">Your Boards</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        {% for board in boards %}
+            <div class="bg-white rounded-lg shadow p-4">
+                <h3 class="text-lg font-semibold">{{ board.name }}</h3>
+                <p class="text-gray-600">{{ board.pins.count }} Pins</p>
+                <div class="mt-2 text-sm text-gray-600">
+                    By <a href="{% url 'profile' board.user.username %}" class="text-gray-800 hover:underline">{{ board.user.username }}</a>
+                    {% if board.user.avatar %}
+                        <img src="{{ board.user.avatar.url }}" alt="{{ board.user.username }}'s avatar" class="w-6 h-6 rounded-full inline-block ml-2 align-middle">
+                    {% else %}
+                        <div class="w-6 h-6 bg-gray-300 rounded-full inline-block ml-2 align-middle"></div>
+                    {% endif %}
+                </div>
+                <div class="mt-2">
+                    <a href="{% url 'board_detail' board.id %}" class="hover:underline">View Board</a>
+                    <a href="{% url 'edit_board' board.id %}" class="hover:underline ml-4">Edit</a>
+                    <a href="{% url 'delete_board' board.id %}" class="hover:underline ml-4">Delete</a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

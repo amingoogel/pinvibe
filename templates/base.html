@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}PinVibe{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #74013f;
+            --secondary-color: #a61c4e;
+            --highlight-color: #FFD700; /* Gold */
+        }
+        body {
+            background-color: #f7f7f7;
+            color: #333;
+            font-family: 'Arial', sans-serif;
+        }
+        nav {
+            background-color: var(--primary-color);
+        }
+        nav a {
+            color: white;
+        }
+        nav a:hover {
+            color: var(--secondary-color);
+        }
+        .button, input[type=submit], button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+        }
+        .button:hover, input[type=submit]:hover, button:hover {
+            background-color: var(--secondary-color);
+        }
+        a:link, a:visited {
+            color: var(--primary-color);
+        }
+        a:hover {
+            color: var(--secondary-color);
+        }
+        .pin-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .pin-card:hover {
+            transform: rotate(5deg) scale(1.05);
+            box-shadow: 0 8px 16px rgba(116, 1, 63, 0.3);
+            z-index: 10;
+        }
+        .navbar-btn {
+            border: 1px solid white;
+            background: transparent;
+            color: white !important;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: background 0.2s, color 0.2s;
+        }
+        .navbar-btn:hover {
+            background: white;
+            color: var(--primary-color) !important;
+        }
+        .pinvibe-logo {
+            color: var(--highlight-color) !important;
+            text-shadow: 1px 1px 8px rgba(0,0,0,0.15);
+        }
+        .search-btn {
+            background: var(--highlight-color);
+            border: none;
+            border-top-right-radius: 20px;
+            border-bottom-right-radius: 20px;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            padding: 8px 12px;
+            transition: background 0.2s;
+        }
+        .search-btn:hover {
+            background: #e6c200;
+        }
+        .comment-btn {
+            border: 1px solid var(--highlight-color);
+            background: var(--highlight-color);
+            color: white;
+            border-radius: 20px;
+            padding: 8px 20px;
+            font-weight: bold;
+            transition: background 0.2s, color 0.2s;
+        }
+        .comment-btn:hover {
+            background: white;
+            color: var(--highlight-color);
+            border: 1px solid var(--highlight-color);
+        }
+        @media (max-width: 768px) {
+            .pin-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="shadow p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="{% url 'pin_list' %}" class="text-2xl font-bold pinvibe-logo">PinVibe</a>
+            <div class="flex space-x-4">
+                <form action="{% url 'search_pins' %}" method="get" class="flex">
+                    <input type="text" name="q" placeholder="Search..." class="p-2 border rounded-l-lg">
+                    <button type="submit" class="search-btn"><i class="fas fa-search text-white"></i></button>
+                </form>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'pin_list' %}" class="navbar-btn">Home</a>
+                    <a href="{% url 'create_pin' %}" class="navbar-btn">Create Pin</a>
+                    <a href="{% url 'create_board' %}" class="navbar-btn">Create Board</a>
+                    <a href="{% url 'user_profile' %}" class="navbar-btn">Profile</a>
+                    <a href="{% url 'logout' %}" class="navbar-btn">Logout</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="navbar-btn">Login</a>
+                    <a href="{% url 'register' %}" class="navbar-btn">Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    <div class="container mx-auto mt-8">
+        {% block content %}
+        {% endblock %}
+    </div>
+</body>
+</html>
