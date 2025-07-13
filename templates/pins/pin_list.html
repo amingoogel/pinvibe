@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% block title %}PinVibe - Discover Amazing Pins{% endblock %}
+{% block content %}
+<div class="max-w-7xl mx-auto px-4">
+    <!-- Hero Section -->
+    <div class="text-center mb-8 py-8">
+        <h1 class="text-4xl font-bold text-gray-800 mb-4">Discover Amazing Pins</h1>
+        <p class="text-xl text-gray-600 mb-6">Find inspiration and share your creativity with the world</p>
+        {% if user.is_authenticated %}
+            <div class="flex justify-center space-x-4">
+                <a href="{% url 'create_pin' %}" class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 shadow-lg hover:shadow-xl flex items-center">
+                    <i class="fas fa-plus mr-2"></i>Create Pin
+                </a>
+                <a href="?following" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 shadow-lg hover:shadow-xl flex items-center">
+                    <i class="fas fa-users mr-2"></i>Following Only
+                </a>
+            </div>
+        {% else %}
+            <a href="{% url 'login' %}" class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 shadow-lg hover:shadow-xl inline-flex items-center">
+                <i class="fas fa-sign-in-alt mr-2"></i>Get Started
+            </a>
+        {% endif %}
+    </div>
+
+    <!-- Categories Section -->
+    <div class="mb-8">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-2xl font-bold text-gray-800 flex items-center">
+                <i class="fas fa-tags mr-2 text-blue-500"></i>Categories
+            </h2>
+            <a href="{% url 'search_pins' %}" class="text-blue-500 hover:text-blue-600 font-medium flex items-center">
+                <i class="fas fa-search mr-1"></i>Advanced Search
+            </a>
+        </div>
+        <div class="flex flex-wrap gap-3">
+            <a href="{% url 'pin_list' %}" class="bg-gradient-to-r from-red-500 to-pink-500 text-white px-6 py-3 rounded-full hover:from-red-600 hover:to-pink-600 transition-all duration-200 shadow-md hover:shadow-lg font-medium">
+                <i class="fas fa-th-large mr-2"></i>All Pins
+            </a>
+            {% for category in categories %}
+                <a href="{% url 'search_pins' %}?category={{ category.id }}" class="bg-white border-2 border-gray-200 text-gray-700 px-6 py-3 rounded-full hover:border-blue-500 hover:text-blue-600 transition-all duration-200 shadow-md hover:shadow-lg font-medium">
+                    {{ category.name }}
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Pins Grid -->
+    <div class="mb-8">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-semibold text-gray-800">
+                {% if request.GET.following %}
+                    <i class="fas fa-users mr-2 text-blue-500"></i>Following Feed
+                {% else %}
+                    <i class="fas fa-fire mr-2 text-red-500"></i>Latest Pins
+                {% endif %}
+            </h3>
+            <span class="text-gray-500">{{ pins.count }} pins</span>
+        </div>
+        
+        {% if pins %}
+            <div class="pin-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {% for pin in pins %}
+                <div class="pin-card bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+                    <a href="{% url 'pin_detail' pin.id %}">
+                        <div class="relative">
+                            <img src="{{ pin.image.url }}" alt="{{ pin.title }}" class="w-full h-56 object-cover">
+                            <div class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-50 transition-all duration-300 flex items-center justify-center opacity-0 hover:opacity-100">
+                                <div class="flex space-x-3">
+                                    <button class="bg-white text-gray-800 px-4 py-2 rounded-full font-medium hover:bg-gray-100 transition-colors duration-200 shadow-lg">
+                                        <i class="fas fa-bookmark mr-1"></i>Save
+                                    </button>
+                                    <button class="bg-white text-red-500 px-4 py-2 rounded-full font-medium hover:bg-gray-100 transition-colors duration-200 shadow-lg">
+                                        <i class="fas fa-heart"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            {% if pin.category %}
+                                <div class="absolute top-3 left-3">
+                                    <span class="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">{{ pin.category.name }}</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </a>
+                    <div class="p-4">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2 line-clamp-2">{{ pin.title }}</h3>
+                        <p class="text-gray-600 text-sm mb-3 line-clamp-2">{{ pin.description|truncatewords:15 }}</p>
+                        
+                        <!-- User Info -->
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-8 h-8 flex-shrink-0">
+                                    {% if pin.user.avatar %}
+                                        <img src="{{ pin.user.avatar.url }}" alt="{{ pin.user.username }}'s avatar" class="w-full h-full object-cover rounded-full">
+                                    {% else %}
+                                        <div class="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 rounded-full flex items-center justify-center">
+                                            <span class="text-xs text-gray-600 font-medium">{{ pin.user.username|first|upper }}</span>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <a href="{% url 'profile' pin.user.username %}" class="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors duration-200">
+                                    {{ pin.user.username }}
+                                </a>
+                            </div>
+                            <div class="flex items-center space-x-2 text-gray-500 text-sm">
+                                <span class="flex items-center">
+                                    <i class="fas fa-heart mr-1 text-red-400"></i>
+                                    {{ pin.likes.count }}
+                                </span>
+                                <span class="flex items-center">
+                                    <i class="fas fa-bookmark mr-1 text-blue-400"></i>
+                                    {{ pin.saved_by.count }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-16">
+                <div class="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-thumbtack text-4xl text-gray-400"></i>
+                </div>
+                <h3 class="text-2xl font-semibold text-gray-700 mb-2">No pins found</h3>
+                <p class="text-gray-500 mb-6">
+                    {% if request.GET.following %}
+                        Follow some users to see their pins here!
+                    {% else %}
+                        Be the first to create amazing pins!
+                    {% endif %}
+                </p>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'create_pin' %}" class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 shadow-lg hover:shadow-xl inline-flex items-center">
+                        <i class="fas fa-plus mr-2"></i>Create Your First Pin
+                    </a>
+                {% else %}
+                    <a href="{% url 'register' %}" class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 shadow-lg hover:shadow-xl inline-flex items-center">
+                        <i class="fas fa-user-plus mr-2"></i>Join PinVibe
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+</style>
+{% endblock %}

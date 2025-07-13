@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% block title %}Search - PinVibe{% endblock %}
+{% block content %}
+<div class="max-w-7xl mx-auto px-4">
+    <!-- Search Header -->
+    <div class="text-center mb-8 py-8">
+        <h1 class="text-4xl font-bold text-gray-800 mb-4">Discover Amazing Pins</h1>
+        <p class="text-xl text-gray-600">Find exactly what you're looking for</p>
+    </div>
+
+    <!-- Search Form -->
+    <div class="max-w-4xl mx-auto mb-8">
+        <form method="get" action="{% url 'search_pins' %}" class="bg-white rounded-2xl shadow-lg p-6">
+            <div class="flex flex-col md:flex-row gap-4">
+                <div class="flex-1">
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <i class="fas fa-search text-gray-400"></i>
+                        </div>
+                        <input type="text" name="q" value="{{ query }}" placeholder="Search for pins, titles, descriptions..." class="w-full pl-12 pr-4 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors duration-200">
+                    </div>
+                </div>
+                <div class="md:w-48">
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-tag text-gray-400"></i>
+                        </div>
+                        <select name="category" class="w-full pl-10 pr-4 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors duration-200 appearance-none bg-white">
+                            <option value="">All Categories</option>
+                            {% for category in categories %}
+                                <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:"s" %}selected{% endif %}>{{ category.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <i class="fas fa-chevron-down text-gray-400"></i>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white px-8 py-4 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                    <i class="fas fa-search mr-2"></i>Search
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Search Results -->
+    <div class="mb-8">
+        {% if query or request.GET.category %}
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 flex items-center">
+                    <i class="fas fa-search mr-2 text-red-500"></i>
+                    Search Results
+                </h2>
+                <span class="text-gray-500">{{ pins.count }} pins found</span>
+            </div>
+        {% endif %}
+
+        {% if pins %}
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {% for pin in pins %}
+                <div class="pin-card bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+                    <a href="{% url 'pin_detail' pin.id %}">
+                        <div class="relative">
+                            <img src="{{ pin.image.url }}" alt="{{ pin.title }}" class="w-full h-56 object-cover">
+                            <div class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-50 transition-all duration-300 flex items-center justify-center opacity-0 hover:opacity-100">
+                                <div class="flex space-x-3">
+                                    <button class="bg-white text-gray-800 px-4 py-2 rounded-full font-medium hover:bg-gray-100 transition-colors duration-200 shadow-lg">
+                                        <i class="fas fa-bookmark mr-1"></i>Save
+                                    </button>
+                                    <button class="bg-white text-red-500 px-4 py-2 rounded-full font-medium hover:bg-gray-100 transition-colors duration-200 shadow-lg">
+                                        <i class="fas fa-heart"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            {% if pin.category %}
+                                <div class="absolute top-3 left-3">
+                                    <span class="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">{{ pin.category.name }}</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </a>
+                    <div class="p-4">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2 line-clamp-2">{{ pin.title }}</h3>
+                        <p class="text-gray-600 text-sm mb-3 line-clamp-2">{{ pin.description|truncatewords:15 }}</p>
+                        
+                        <!-- User Info -->
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-8 h-8 flex-shrink-0">
+                                    {% if pin.user.avatar %}
+                                        <img src="{{ pin.user.avatar.url }}" alt="{{ pin.user.username }}'s avatar" class="w-full h-full object-cover rounded-full">
+                                    {% else %}
+                                        <div class="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 rounded-full flex items-center justify-center">
+                                            <span class="text-xs text-gray-600 font-medium">{{ pin.user.username|first|upper }}</span>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <a href="{% url 'profile' pin.user.username %}" class="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors duration-200">
+                                    {{ pin.user.username }}
+                                </a>
+                            </div>
+                            <div class="flex items-center space-x-2 text-gray-500 text-sm">
+                                <span class="flex items-center">
+                                    <i class="fas fa-heart mr-1 text-red-400"></i>
+                                    {{ pin.likes.count }}
+                                </span>
+                                <span class="flex items-center">
+                                    <i class="fas fa-bookmark mr-1 text-blue-400"></i>
+                                    {{ pin.saved_by.count }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            {% if query or request.GET.category %}
+                <div class="text-center py-16">
+                    <div class="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-search text-4xl text-gray-400"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold text-gray-700 mb-2">No pins found</h3>
+                    <p class="text-gray-500 mb-6">
+                        {% if query %}
+                            No pins match "{{ query }}"
+                        {% else %}
+                            No pins in this category
+                        {% endif %}
+                    </p>
+                    <div class="flex justify-center space-x-4">
+                        <a href="{% url 'pin_list' %}" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 shadow-lg hover:shadow-xl inline-flex items-center">
+                            <i class="fas fa-th-large mr-2"></i>Browse All Pins
+                        </a>
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'create_pin' %}" class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 shadow-lg hover:shadow-xl inline-flex items-center">
+                                <i class="fas fa-plus mr-2"></i>Create Pin
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    <!-- Popular Categories -->
+    {% if not query and not request.GET.category %}
+        <div class="mt-16">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Popular Categories</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                {% for category in categories %}
+                    <a href="{% url 'search_pins' %}?category={{ category.id }}" class="bg-white rounded-lg p-4 text-center shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1">
+                        <div class="w-12 h-12 mx-auto mb-3 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-tag text-blue-600"></i>
+                        </div>
+                        <p class="font-medium text-gray-800">{{ category.name }}</p>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+</style>
+{% endblock %}

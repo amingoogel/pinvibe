@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}{{ board.name }}{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <h1 class="text-2xl font-bold mb-4">{{ board.name }}</h1>
+    <div class="masonry-grid">
+        <div class="masonry-grid-column">
+            {% for pin in board.pins.all %}
+            <div class="pin-card relative">
+                <a href="{% url 'pin_detail' pin.id %}">
+                    <img src="{{ pin.image.url }}" alt="{{ pin.title }}" class="w-full rounded-lg">
+                    <div class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-50 transition-opacity duration-300 flex items-center justify-center opacity-0 hover:opacity-100">
+                        <button class="bg-red-600 text-white px-4 py-2 rounded-full mr-2">Save</button>
+                        <button class="text-white"><i class="fas fa-heart"></i></button>
+                    </div>
+                </a>
+                <h3 class="mt-2 text-lg font-semibold">{{ pin.title }}</h3>
+                <p class="text-gray-600">{{ pin.description|truncatewords:10 }}</p>
+                {% if pin.category %}
+                    <p class="text-gray-500 text-sm">Category: {{ pin.category.name }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+        $('.masonry-grid').masonry({
+            itemSelector: '.pin-card',
+            columnWidth: '.masonry-grid-column',
+            percentPosition: true
+        });
+    });
+</script>
+{% endblock %}

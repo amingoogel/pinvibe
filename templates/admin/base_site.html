@@ -1,0 +1,44 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | PinVibe Admin{% endblock %}
+
+{% block extrastyle %}
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+        }
+        .content {
+            background: #f7fafc;
+        }
+        #header {
+            background: #dc2626;
+            color: white;
+        }
+        .module h2, .module caption, .inline-group h2 {
+            background: #dc2626;
+            color: white;
+        }
+        a:link, a:visited {
+            color: #dc2626;
+        }
+        a:hover {
+            color: #b91c1c;
+        }
+        .button, input[type=submit], input[type=button], .submit-row input {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+        }
+        .button:hover, input[type=submit]:hover, input[type=button]:hover {
+            background: #b91c1c;
+        }
+    </style>
+{% endblock %}
+
+{% block branding %}
+    <h1 id="site-name"><a href="{% url 'admin:index' %}">PinVibe Admin</a></h1>
+{% endblock %}
