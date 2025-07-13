@@ -2,21 +2,8 @@ from rest_framework import generics, status, viewsets, permissions
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
-from django.http import HttpResponse
-from django.contrib.auth import get_user_model
 from .serializers import UserSerializer, FollowSerializer
 from .models import User, Follow
-
-def create_superuser(request):
-    """Temporary view to create superuser - REMOVE AFTER USE"""
-    try:
-        User = get_user_model()
-        if not User.objects.filter(username="admin").exists():
-            User.objects.create_superuser("admin", "admin@pinvibe.com", "admin123456")
-            return HttpResponse("Superuser created successfully! Username: admin, Password: admin123456")
-        return HttpResponse("Superuser already exists!")
-    except Exception as e:
-        return HttpResponse(f"Error: {str(e)}")
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()

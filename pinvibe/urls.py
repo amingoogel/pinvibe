@@ -3,7 +3,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from pins.views import PinViewSet, CommentViewSet, LikeViewSet
 from boards.views import BoardViewSet
-from users.views import FollowViewSet, create_superuser
+from users.views import FollowViewSet
 from django.conf import settings
 from django.conf.urls.static import static
 from pins.views import CategoryViewSet
@@ -18,7 +18,6 @@ router.register(r'categories', CategoryViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('create-superuser/', create_superuser, name='create_superuser'),  # TEMPORARY - REMOVE AFTER USE
 
     path('api/', include(router.urls)),
     path('api/users/', include('users.urls')),
