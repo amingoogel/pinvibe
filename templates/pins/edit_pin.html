@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block title %}Edit Pin{% endblock %}
 {% block content %}
-<div class="max-w-md mx-auto bg-white rounded-lg shadow p-6">
+<div class="max-w-md mx-auto bg-white rounded-lg shadow p-6 px-2 md:px-6">
     <h1 class="text-2xl font-bold mb-4">Edit Pin</h1>
     {% if messages %}
         {% for message in messages %}
@@ -43,7 +43,7 @@
                 {% endfor %}
             </select>
         </div>
-        <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-full">Update Pin</button>
+        <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-full w-full md:w-auto">Update Pin</button>
     </form>
 </div>
 {% endblock %}

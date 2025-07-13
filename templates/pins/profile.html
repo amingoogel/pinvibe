@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 {% block title %}{{ profile_user.username }}'s Profile{% endblock %}
 {% block content %}
-<div class="max-w-4xl mx-auto bg-white rounded-lg shadow p-6">
-    <div class="flex items-start justify-between mb-6">
-        <div class="flex items-center space-x-6">
+<div class="max-w-4xl mx-auto bg-white rounded-lg shadow p-6 px-2 md:px-6">
+    <div class="flex flex-col md:flex-row items-start justify-between mb-6 gap-6">
+        <div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
             <div class="w-24 h-24 flex-shrink-0">
                 {% if profile_user.avatar %}
                     <img src="{{ profile_user.avatar.url }}" alt="{{ profile_user.username }}'s avatar" class="w-full h-full object-cover rounded-full shadow-md">

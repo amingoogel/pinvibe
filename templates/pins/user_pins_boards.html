@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block title %}Your Pins & Boards{% endblock %}
 {% block content %}
-<div class="max-w-6xl mx-auto">
+<div class="max-w-6xl mx-auto px-2 md:px-4">
     <h1 class="text-2xl font-bold mb-4">Your Pins & Boards</h1>
     {% if messages %}
         {% for message in messages %}
@@ -39,7 +39,7 @@
         </div>
         {% endfor %}
     </div>
-    <h2 class="text-xl font-semibold mt-6 mb-2">Your Boards</h2>
+    <h2 class="text-xl font-semibold mb-2 mt-8">Your Boards</h2>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {% for board in boards %}
             <div class="bg-white rounded-lg shadow p-4">
@@ -53,10 +53,10 @@
                         <div class="w-6 h-6 bg-gray-300 rounded-full inline-block ml-2 align-middle"></div>
                     {% endif %}
                 </div>
-                <div class="mt-2">
+                <div class="mt-2 flex flex-col sm:flex-row gap-2">
                     <a href="{% url 'board_detail' board.id %}" class="hover:underline">View Board</a>
-                    <a href="{% url 'edit_board' board.id %}" class="hover:underline ml-4">Edit</a>
-                    <a href="{% url 'delete_board' board.id %}" class="hover:underline ml-4">Delete</a>
+                    <a href="{% url 'edit_board' board.id %}" class="hover:underline ml-0 sm:ml-4">Edit</a>
+                    <a href="{% url 'delete_board' board.id %}" class="hover:underline ml-0 sm:ml-4">Delete</a>
                 </div>
             </div>
         {% endfor %}
