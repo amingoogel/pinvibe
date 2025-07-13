@@ -1,1 +1,1 @@
-web: gunicorn pinvibe.wsgi:application
+web: python manage.py migrate && gunicorn pinvibe.wsgi:application
