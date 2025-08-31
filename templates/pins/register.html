@@ -14,11 +14,15 @@
 
         <!-- Register Form -->
         <div class="bg-white rounded-2xl shadow-xl p-8">
-            {% if error %}
+            {% if errors %}
                 <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
                     <div class="flex items-center">
                         <i class="fas fa-exclamation-circle text-red-500 mr-3"></i>
-                        <p class="text-red-700">{{ error }}</p>
+                        <div>
+                            {% for field, error in errors.items %}
+                                <p class="text-red-700">{{ error }}</p>
+                            {% endfor %}
+                        </div>
                     </div>
                 </div>
             {% endif %}
@@ -27,38 +31,58 @@
                 {% csrf_token %}
                 
                 <div>
-                    <label class="block text-gray-700 font-medium mb-2">Username</label>
+                    <label class="block text-gray-700 font-medium mb-2">نام کاربری</label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <i class="fas fa-user text-gray-400"></i>
                         </div>
-                        <input type="text" name="username" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200" placeholder="Choose a username" required>
+                        <input type="text" name="username" value="{{ form_data.username|default:'' }}" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200" placeholder="نام کاربری خود را انتخاب کنید" required>
                     </div>
+                    {% if errors.username %}
+                        <p class="text-red-500 text-sm mt-1">{{ errors.username }}</p>
+                    {% endif %}
                 </div>
 
                 <div>
-                    <label class="block text-gray-700 font-medium mb-2">Email</label>
+                    <label class="block text-gray-700 font-medium mb-2">ایمیل</label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <i class="fas fa-envelope text-gray-400"></i>
                         </div>
-                        <input type="email" name="email" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200" placeholder="Enter your email" required>
+                        <input type="email" name="email" value="{{ form_data.email|default:'' }}" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200" placeholder="ایمیل خود را وارد کنید" required>
                     </div>
+                    {% if errors.email %}
+                        <p class="text-red-500 text-sm mt-1">{{ errors.email }}</p>
+                    {% endif %}
                 </div>
 
                 <div>
-                    <label class="block text-gray-700 font-medium mb-2">Password</label>
+                    <label class="block text-gray-700 font-medium mb-2">رمز عبور</label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <i class="fas fa-lock text-gray-400"></i>
                         </div>
-                        <input type="password" name="password" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200" placeholder="Create a password" required>
+                        <input type="password" name="password" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200" placeholder="رمز عبور خود را ایجاد کنید" required>
                     </div>
-                    <p class="text-xs text-gray-500 mt-1">Password must be at least 8 characters long</p>
+                    {% if errors.password %}
+                        <p class="text-red-500 text-sm mt-1">{{ errors.password }}</p>
+                    {% else %}
+                        <p class="text-xs text-gray-500 mt-1">رمز عبور باید حداقل ۸ کاراکتر باشد و شامل حروف بزرگ، کوچک، اعداد و کاراکترهای خاص باشد</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">تایید رمز عبور</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-lock text-gray-400"></i>
+                        </div>
+                        <input type="password" name="password_confirm" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200" placeholder="رمز عبور را دوباره وارد کنید" required>
+                    </div>
                 </div>
 
                 <button type="submit" class="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white py-3 px-6 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-                    <i class="fas fa-user-plus mr-2"></i>Create Account
+                    <i class="fas fa-user-plus mr-2"></i>ایجاد حساب کاربری
                 </button>
             </form>
 

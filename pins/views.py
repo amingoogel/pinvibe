@@ -149,10 +149,35 @@ def login_view(request):
         return redirect('pin_list')
     
     if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
+        username = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '')
+        
+        if not username or not password:
+            return render(request, 'pins/login.html', {
+                'error': 'نام کاربری و رمز عبور الزامی است.',
+                'form_data': {'username': username}
+            })
+        
         user = authenticate(request, username=username, password=password)
+        
         if user:
+            # بررسی تایید ایمیل
+            if not user.is_active:
+                return render(request, 'pins/login.html', {
+                    'error': 'حساب کاربری شما فعال نیست. لطفاً ایمیل خود را تایید کنید.',
+                    'form_data': {'username': username},
+                    'needs_verification': True,
+                    'email': user.email
+                })
+            
+            if not user.is_email_verified:
+                return render(request, 'pins/login.html', {
+                    'error': 'ایمیل شما تایید نشده است. لطفاً ایمیل خود را تایید کنید.',
+                    'form_data': {'username': username},
+                    'needs_verification': True,
+                    'email': user.email
+                })
+            
             login(request, user)
             # اگر next parameter وجود دارد، به آن صفحه برو
             next_url = request.GET.get('next')
@@ -160,7 +185,11 @@ def login_view(request):
                 return redirect(next_url)
             return redirect('pin_list')
         else:
-            return render(request, 'pins/login.html', {'error': 'Invalid credentials'})
+            return render(request, 'pins/login.html', {
+                'error': 'نام کاربری یا رمز عبور اشتباه است.',
+                'form_data': {'username': username}
+            })
+    
     return render(request, 'pins/login.html')
 
 def register_view(request):
@@ -170,14 +199,79 @@ def register_view(request):
     
     if request.method == 'POST':
         from users.models import User
-        username = request.POST['username']
-        email = request.POST['email']
-        password = request.POST['password']
-        if User.objects.filter(username=username).exists():
-            return render(request, 'pins/register.html', {'error': 'Username already exists'})
-        user = User.objects.create_user(username=username, email=email, password=password)
-        login(request, user)
-        return redirect('pin_list')
+        from users.validators import PersianPasswordValidator
+        from django.core.exceptions import ValidationError
+        
+        username = request.POST.get('username', '').strip()
+        email = request.POST.get('email', '').strip()
+        password = request.POST.get('password', '')
+        password_confirm = request.POST.get('password_confirm', '')
+        
+        errors = {}
+        
+        # اعتبارسنجی نام کاربری
+        if not username:
+            errors['username'] = 'نام کاربری الزامی است.'
+        elif User.objects.filter(username=username).exists():
+            errors['username'] = 'این نام کاربری قبلاً استفاده شده است.'
+        elif not username.replace('_', '').isalnum():
+            errors['username'] = 'نام کاربری فقط می‌تواند شامل حروف، اعداد و خط زیر باشد.'
+        
+        # اعتبارسنجی ایمیل
+        if not email:
+            errors['email'] = 'ایمیل الزامی است.'
+        elif User.objects.filter(email=email).exists():
+            errors['email'] = 'این ایمیل قبلاً استفاده شده است.'
+        
+        # اعتبارسنجی رمز عبور
+        if not password:
+            errors['password'] = 'رمز عبور الزامی است.'
+        elif password != password_confirm:
+            errors['password'] = 'رمزهای عبور مطابقت ندارند.'
+        else:
+            try:
+                validator = PersianPasswordValidator()
+                validator.validate(password)
+            except ValidationError as e:
+                errors['password'] = e.messages[0] if e.messages else 'رمز عبور نامعتبر است.'
+        
+        if errors:
+            return render(request, 'pins/register.html', {
+                'errors': errors,
+                'form_data': {
+                    'username': username,
+                    'email': email
+                }
+            })
+        
+        # ایجاد کاربر
+        try:
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password,
+                is_active=False  # کاربر باید ایمیل را تایید کند
+            )
+            
+            # ارسال ایمیل تایید
+            from users.utils import send_verification_email
+            if send_verification_email(user):
+                messages.success(request, 'ثبت نام با موفقیت انجام شد. لطفاً ایمیل خود را برای تایید بررسی کنید.')
+            else:
+                messages.warning(request, 'ثبت نام انجام شد اما ارسال ایمیل تایید با مشکل مواجه شد.')
+            
+            return redirect('login')
+            
+        except Exception as e:
+            errors['general'] = f'خطا در ثبت نام: {str(e)}'
+            return render(request, 'pins/register.html', {
+                'errors': errors,
+                'form_data': {
+                    'username': username,
+                    'email': email
+                }
+            })
+    
     return render(request, 'pins/register.html')
 
 @login_required

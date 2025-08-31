@@ -21,6 +21,7 @@ urlpatterns = [
 
     path('api/', include(router.urls)),
     path('api/users/', include('users.urls')),
+    path('users/', include('users.urls')),  # برای دسترسی به URL های تایید ایمیل
     path('', include('pins.urls')),
 ]
 

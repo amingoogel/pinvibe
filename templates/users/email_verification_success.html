@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تایید ایمیل موفق</title>
+    <style>
+        body {
+            font-family: 'Tahoma', 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .success-icon {
+            font-size: 60px;
+            color: #27ae60;
+            margin-bottom: 20px;
+        }
+        .title {
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        .message {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .button {
+            display: inline-block;
+            background-color: #e74c3c;
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .button:hover {
+            background-color: #c0392b;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        {% if verified %}
+            <div class="success-icon">✓</div>
+            <div class="title">ایمیل شما با موفقیت تایید شد!</div>
+            <div class="message">
+                <p>حساب کاربری شما فعال شده است و می‌توانید از تمام امکانات PinVibe استفاده کنید.</p>
+            </div>
+            
+            <a href="/login/" class="button">ورود به حساب کاربری</a>
+        {% else %}
+            <div class="success-icon" style="color: #e74c3c;">✗</div>
+            <div class="title" style="color: #e74c3c;">خطا در تایید ایمیل</div>
+            <div class="message">
+                <p>{{ error }}</p>
+            </div>
+            
+            <a href="/register/" class="button">ثبت نام مجدد</a>
+        {% endif %}
+        
+        <div class="footer">
+            <p>© 2024 PinVibe. تمامی حقوق محفوظ است.</p>
+        </div>
+    </div>
+</body>
+</html> 
