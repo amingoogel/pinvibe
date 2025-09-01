@@ -12,3 +12,4 @@ cloudinary==1.39.0
 django-cloudinary-storage==0.3.0
 django-cors-headers==4.3.1
 django-email-verification==0.3.2
+python-dotenv
